@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block head_title %}
+Register Document | Local LLM for CPU
+{% endblock %}
+
+{% block title %}
+Register Document | Local LLM for CPU
+{% endblock %}
+
+{% block content %}
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {% for f in form %}
+  <div class="edit-form">
+    {{ f.errors }}
+    <span class="edit-label">{{ f.label }}</span>
+    <span class="edit-content">{{ f }}</span>
+  </div>
+    {% endfor %}
+    {% for t in test %}
+    <p>{{ t }}</p>
+    {% endfor %}
+  <input type="submit" value="Save" />
+</form>
+{% endblock %}

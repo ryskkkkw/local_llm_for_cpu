@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block head_title %}
+Home | Local LLM for CPU
+{% endblock %}
+
+{% block title %}
+Home | Local LLM for CPU
+{% endblock %}
+
+{% block content %}
+<ul class="auth-container liststyle">
+  <li class="index-list">
+    <a href="{% url 'local_llm:register_llm' %}">Register LLM Model</a>
+    <a href="{% url 'local_llm:register_embed' %}">Register Embed Model</a>
+    <a href="{% url 'local_llm:register_document' %}">Register Document</a>
+    <a href="{% url 'local_llm:llm_and_embed' %}">Query</a>
+  </li>
+</ul>
+{% endblock %}

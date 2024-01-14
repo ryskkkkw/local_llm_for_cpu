@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block head_title %}
+Select LLM and Embed Model | Local LLM for CPU
+{% endblock %}
+
+{% block title %}
+Select LLM and Embed Model | Local LLM for CPU
+{% endblock %}
+
+{% block content %}
+<form class="container" action="{% url 'local_llm:document_and_query' %}" method="get">
+  <p class="edit-form">Select LLM Model</p>
+  <div class="form-content edit-form ">
+    <div>
+      <select class="button" name="llm">
+        {% for llm in llm_model %}
+        <option value="{{ llm.pk }}" class="party">{{ llm.llm_model }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  <p class="edit-form">Select Embed Model</p>
+  <div class="edit-form">
+    <div>
+      <select class="button" name="embed">
+        {% for embed in embed_model %}
+        <option value="{{ embed.pk }}" class="party">{{ embed.embed_model }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  <div class="submit">
+    <input type="submit" value="next">
+  </div>
+</form>
+{% endblock %}

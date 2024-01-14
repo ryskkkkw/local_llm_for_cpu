@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block head_title %}
+Select Document and Input Query | Local LLM for CPU
+{% endblock %}
+
+{% block title %}
+Select Document and Input Query | Local LLM for CPU
+{% endblock %}
+
+{% block content %}
+<form action="{% url 'local_llm:response' llm=llm embed=embed %}" method="get">
+  <p class="edit-form">Select Document</p>
+  <div class="edit-form">
+    <div>
+      <select class="button" name="document">
+        {% for document in documents %}
+        <option value="{{ document.pk }}" class="party">{{ document.document_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  <p class="edit-form">Input Query</p>
+  <div class="edit-form">
+    <div>
+      <input type="text" name="query" size="100">
+    </div>
+  </div>
+  <div class="submit">
+    <input type="submit" value="Start Query">
+  </div>
+</form>
+{% comment %}
+</form>
+{% endcomment %}
+{% endblock %}
