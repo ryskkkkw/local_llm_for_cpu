@@ -11,13 +11,14 @@
 
 # 1.　プロジェクトについて
 
-3番目のポートフォリオとしてローカル環境でLLMを動かせる[llama.cpp](https://github.com/ggerganov/llama.cpp)のPythonバインディングライブラリである[llama-cpp-python](https://github.com/abetlen/llama-cpp-python?tab=readme-ov-file)と、LLMが参照するデータを拡張するフレームワークである[LlamaIndex](https://github.com/run-llama/llama_index?tab=readme-ov-file)を使ったプログラムを作成しました。気軽に手元のノートPCのCPUで動かすLLMプログラムということで、プロジェクト名は「local_llm_for_cpu」としました。  
-このプロジェクトを始めた理由は、生成AIが日常生活でも広く使われて身近な存在になってきていることや、そもそもPythonを学んだ理由の一つが、機械学習やAIといった分野に関心があり、いずれ取り組んでみたいと考えていたからです。そして何より、生成AIは高性能なGPUが必須であり、クラウド環境を使うとしてもある程度のコストはかかると考えていましたが、llama-cpp-pythonの存在を知ったことで、ローカルで気軽に色々と試しながら作業ができると思えたことが大きかったです。  
-[e-lectionのREADME](https://github.com/ryskkkkw/e-lection)の「1.プロジェクトについて」にもあるとおり、
-ECサイトを作成した理由は、基本的なCRUD操作を実装できること、一般的なWebサービスなので完成形や機能がイメージしやすいためです。また、テーマがある方がより実践的に取り組めるため、規格外で本来は廃棄となる野菜や果物を売買するECサイトを想定し、プロジェクト名を「eFarm」としました。 
+3番目のポートフォリオとして、ローカル環境でLLMを動かせる[llama.cpp](https://github.com/ggerganov/llama.cpp)のPythonバインディングライブラリである[llama-cpp-python](https://github.com/abetlen/llama-cpp-python?tab=readme-ov-file)と、LLMが参照するデータを拡張するフレームワークである[LlamaIndex](https://github.com/run-llama/llama_index?tab=readme-ov-file)を使ったプログラムを作成しました。気軽に手元のノートPCのCPUで動かすLLMプログラムということで、プロジェクト名は「local_llm_for_cpu」としました。 
 
-架空のサービスではありますが、一般的なECサイトのマーケットプレイスのように、売り手と買い手が存在し、売り手は商品の登録や変更、削除、買い手は商品の検索、決済、購入履歴の確認といった操作を行えるようにしています。ホスティングもしていますので、実際に[eFarm](https://rkrk.pythonanywhere.com/)を確認することができます。
+このプロジェクトを始めた理由は、生成AIが日常生活でも広く使われて身近な存在になってきていることや、そもそもPythonを学んだ理由の一つが、機械学習やAIといった分野に関心があり、いずれ取り組んでみたいと考えていたからです。そして何より、生成AIは高性能なGPUが必要であり、クラウド環境を使うとしてもある程度のコストがかかると考えていましたが、llama-cpp-pythonの存在を知ったことで、ローカルで気軽に色々と試しながら作業ができると思えたことが大きかったです。  
 
+LLMのコンテキスト拡張ができるLlamaIndexを組み込んだのは、最初は2番目のポートフォリオである[e-lection](https://github.com/ryskkkkw/e-lection)に、投票機能だけでなくユーザーの政治に関する疑問などに答える機能を加えたいと考えたからです。LLMだけでは、持っているデータがそのモデルをトレーニングした時点のものに限られ、最新の情報を踏まえたQ&Aが実行できないことや、特定分野の詳細な情報を求められたときに対応が難しいため、LLMが推論を行う際にLlamaIndexで政治に関する資料データを与えることで、政治関係のドメインに特化した生成AIによるQ&A機能を実装することが目的でした。  
+
+しかし、e-lectionのREADME「1.プロジェクトについて」に書いたとおり、CPUで動かすLLMのQ&Aは実行に多くの時間を要するので、最終的にはe-lectionには組み込まずに別のプロジェクトとして、llama-cpp-pythonとLlamaIndexを組み合わせたローカルで動くLLMプログラム「「local_llm_for_cpu」」という形にしました。  
+結果的に別のプロジェクトとなりましたが、ローカル環境で動かすこと、任意のデータを与えて特定分野の質問にも答えられるようにすることというプログラムの機能面での目的は一定程度達成することができました。
 <br>
 
 # 2.ディレクトリ構成
