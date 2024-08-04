@@ -11,7 +11,7 @@
 
 # 1.　プロジェクトについて
 
-3番目のポートフォリオとして、ローカル環境でLLMを動かせる[llama.cpp](https://github.com/ggerganov/llama.cpp)のPythonバインディングライブラリである[llama-cpp-python](https://github.com/abetlen/llama-cpp-python?tab=readme-ov-file)と、LLMが参照するデータを拡張するフレームワークである[LlamaIndex](https://github.com/run-llama/llama_index?tab=readme-ov-file)を使ったプログラムを作成しました。気軽に手元のノートPCのCPUで動かすLLMプログラムということで、プロジェクト名は「local_llm_for_cpu」としました。 
+3つ目のポートフォリオとして、ローカル環境でLLMを動かせる[llama.cpp](https://github.com/ggerganov/llama.cpp)のPythonバインディングライブラリである[llama-cpp-python](https://github.com/abetlen/llama-cpp-python?tab=readme-ov-file)と、LLMが参照するデータを拡張するフレームワークである[LlamaIndex](https://github.com/run-llama/llama_index?tab=readme-ov-file)を使ったプログラムを作成しました。気軽に手元のノートPCのCPUで動かすLLMプログラムということで、プロジェクト名は「local_llm_for_cpu」としました。 
 
 このプロジェクトを始めた理由は、生成AIが日常生活でも広く使われて身近な存在になってきていることや、そもそもPythonを学んだ理由の一つが、機械学習やAIといった分野に関心があり、いずれ取り組んでみたいと考えていたからです。そして何より、生成AIは高性能なGPUが必要であり、クラウド環境を使うとしてもある程度のコストがかかると考えていましたが、llama-cpp-pythonの存在を知ったことで、ローカルで気軽に色々と試しながら作業ができると思えたことが大きかったです。  
 
