@@ -77,6 +77,19 @@ local_llmがこのプロジェクトで唯一のアプリケーションなの�
 - DocumentはLLMの参照データを拡張するファイル用のファイルフィールド、ファイル名の文字列フィールドを持ちます。また、DocumentはEmbedModelオブジェクトと多対一関係になっています。
 <br>
 
-- Q&Aを行う前に、使用するLLM、Embeddingモデル、documentファイルを登録する必要があります。
-- LLMはローカルにあるLLMファイルからアップロードする仕様になっています。アップロードしたLLMファイルは、local_llm_for_cpu/llm_resources/llm_modelsに登録されます。開発時は、[こちらのモデル](https://huggingface.co/mmnga/ELYZA-japanese-Llama-2-7b-fast-instruct-gguf/blob/main/ELYZA-japanese-Llama-2-7b-fast-instruct-q4_K_M.gguf)を使用しました。
-- Embeddingモデルは、使用するモデル名を文字列としてEmbedModelにあらかじめ登録しておき、Q&A実行時にそのモデル名によりHuggingFaceからEmbeddingモデルをダウンロードする仕様です。開発時は、[こちらのモデル](https://huggingface.co/oshizo/sbert-jsnli-luke-japanese-base-lite)を使用しました。
+- コンテキスト拡張したLLMのQ&Aを実行するためには、使用するLLM、Embeddingモデル、documentファイルを事前に登録する必要があります（それぞれ複数登録できます）。
+- LLMはローカルにあるLLMファイルからアップロードする仕様になっています。アップロードしたLLMファイルは、local_llm_for_cpu/llm_resources/llm_modelsに登録されます。開発時のテストでは、[こちらのモデル](https://huggingface.co/mmnga/ELYZA-japanese-Llama-2-7b-fast-instruct-gguf/blob/main/ELYZA-japanese-Llama-2-7b-fast-instruct-q4_K_M.gguf)を使用しました。
+- Embeddingモデルは、使用するモデル名をEmbedModelにあらかじめ登録しておき、Q&A実行時にそのモデル名でHuggingFaceからEmbeddingモデルをダウンロードする仕様です。開発時のテストでは、[こちらのモデル](https://huggingface.co/oshizo/sbert-jsnli-luke-japanese-base-lite)を使用しました。
+- documentファイルはLLM同様にローカルにあるファイルをアップロードします。このアプリケーションではPDFファイルをアップロードする仕様になっています。アップロードしたPDFファイルは、local_llm_for_cpu/llm_resources/documentsに登録されます。ファイルを登録するときは、ファイル名の入力と関連付けるEmbeddingモデルの選択も必要です。
+<br>
+
+- LLM、Embeddingモデル、documentファイルの登録が完了すると、LlamaIndexでコンテキスト拡張したLLMのQ&Aを実行できます。フローは次のようになっています。
+  1. 始めにQ&Aで使用するLLMとEmbeddingモデルを選択する（llm_and_embed.htmlで選択フォームが表示される）。
+  2. フォームを送信すると、LLMのコンテキスト拡張で使用するdocumentファイルの選択、質問を入力するフォーム画面（document_and_query.html）に遷移する。
+  3. documentファイルは、先に選択したEmbeddingモデルに関連付けられているdocumentファイルのみ表示される。また、質問の内容は自由だが、LLMのコンテキスト拡張をしたQ&Aがアプリケーションの趣旨なので、選択したdocumentファイルに関する質問を入力する。
+  4. documentファイルを選択し、質問を入力してからフォームを送信するとQ&Aが実行される。CPUでLLMを動かしているため時間を要するが、Q&Aの実行が終わると回答画面（response.html）にLLMが作成した答えが表示される。
+<br>
+
+- Q&Aの実行プログラムはこのアプリケーションの要であり、また、DjangoではなくLlamaIndexがメインとなっているため、簡単にですがコードにコメントを入れて説明します。
+
+
