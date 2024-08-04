@@ -87,10 +87,12 @@ local_llmがこのプロジェクトで唯一のアプリケーションなの�
   1. 始めにQ&Aで使用するLLMとEmbeddingモデルを選択する（llm_and_embed.htmlで選択フォームが表示される）。
   2. フォームを送信すると、LLMのコンテキスト拡張で使用するdocumentファイルの選択、質問を入力するフォーム画面（document_and_query.html）に遷移する。
   3. documentファイルは、先に選択したEmbeddingモデルに関連付けられているdocumentファイルのみ表示される。また、質問の内容は自由だが、LLMのコンテキスト拡張をしたQ&Aがアプリケーションの趣旨なので、選択したdocumentファイルに関する質問を入力する。
-  4. documentファイルを選択し、質問を入力してからフォームを送信するとQ&Aが実行される。CPUでLLMを動かしているため時間を要するが、Q&Aの実行が終わると回答画面（response.html）にLLMが作成した答えが表示される。
+  4. documentファイルを選択し、質問を入力してからフォームを送信するとQ&Aが実行される。CPUでLLMを動かしているため時間を要するが、実行が終わると回答画面（response.html）にLLMが作成した答えが表示される。
 <br>
 
-- Q&AはResponseViewでstart_query関数を呼び出して実行します。この関数がアプリケーションの要の部分であり、また、DjangoではなくLlamaIndexがメインとなっているため、簡単にですがコードにコメントを入れて説明します。
+- Q&AはResponseViewでstart_query関数を呼び出して実行します。この関数がアプリケーションの要の部分であり、また、DjangoではなくLlamaIndexがメインとなっているため、簡単にですがコードに一部コメントを入れて説明します。
+
+        # local_llm_for_cpu/local_llm/views.py
 
         import os
         import sys, logging
@@ -115,18 +117,23 @@ local_llmがこのプロジェクトで唯一のアプリケーションなの�
           llm_resources = settings.MEDIA_ROOT
           PyMuPDFReader = download_loader("PyMuPDFReader")
           loader = PyMuPDFReader()
-          
+
+          # 事前に選択したdocumentファイル（PDF）を読み込む。
           document_file = Document.objects.get(pk=document_pk).document
           document = loader.load_data(file_path=f"{llm_resources}/{document_file}",
                                       metadata=True)
-          
+
+          # LlamaIndexでllama-cpp-pythonを使用するために、LlamaCPPに事前に選択したLLMのパスを渡してLLMをセットアップする。
           model_file = LlmModel.objects.get(pk=llm_pk).llm_model
           model_path = f"{llm_resources}/{model_file}"
           llm = LlamaCPP(model_path=model_path, temperature=0)
-          
+
+          # 事前に選択したEmbeddingモデル名を使って、HuggingFaceからEmbeddingモデルをダウンロードする。
           embed_file = EmbedModel.objects.get(pk=embed_pk).embed_model
           embed_model = HuggingFaceEmbeddings(model_name=embed_file)
-          
+
+          # 開発時に使用したLLM、Embeddingモデルは日本語データで学習したモデルであり、documentも日本語のファイルなので、
+          # QAテンプレートもデフォルトの英語テンプレートではなく日本語テンプレートを使用する。
           qa_tmpl_str = (
             "コンテキスト情報は以下のとおりです。\n"
             "---------------------\n"
@@ -148,18 +155,24 @@ local_llmがこのプロジェクトで唯一のアプリケーションなの�
             )
           qa_tmpl = PromptTemplate(qa_tmpl_str)
           refine_tmpl = PromptTemplate(refine_tmpl_str)
-          
+
+          # サービスコンテキストにセットアップしたLLMとダウンロードしたEmbeddingモデルを設定する。
           service_context = ServiceContext.from_defaults(
             llm=llm,
             embed_model=embed_model,
             )
-          
+
+          # 使用するdocumentについて、選択したEmbeddingモデルで既にベクトルインデックスが作成されている場合は、
+          # llm_resources/index_storageに該当のベクトルインデックスがあるので読み込む。
           index_storage = f"{llm_resources}/index_storage/{embed_pk}_{document_pk}"
           if os.path.isdir(index_storage):
             print("index existed")
             storage_context = StorageContext.from_defaults(persist_dir=index_storage)
             index = load_index_from_storage(storage_context,
                                             service_context=service_context)
+  
+          # 初めて使用するdocumentだったり、documentは使用したことがあるがベクトル化に使ったEmbeddingモデルが今回のモデルと別だったりすると、
+          # 該当するベクトルインデックスがないため、新たにベクトルインデックスを作成し、llm_resources/index_storageに保存する。
           else:
             print("Not index existed")
             index = VectorStoreIndex.from_documents(
@@ -167,7 +180,8 @@ local_llmがこのプロジェクトで唯一のアプリケーションなの�
             )
             os.mkdir(index_storage)
             index.storage_context.persist(persist_dir=index_storage)
-            
+
+          # 作成したインデックス上に、Q&Aを実行するクエリエンジンを構成し、サービスコンテキスト（LLM、Embeddingモデル）やテンプレートを設定する。
           query_engine = index.as_query_engine(
             show_progress=True,
             streaming=True,
@@ -178,10 +192,15 @@ local_llmがこのプロジェクトで唯一のアプリケーションなの�
             # similarity_top_k=4,
             # response_mode="refine",
           )
-          
+
+          # クエリエンジンを使って質問を実行する。
           response_stream = query_engine.query(query)
           print("response_stream", response_stream)
           
           return response_stream
+<br>
 
+- テストはlocal_llmディレクトリのtest.pyに、LLMやEmbeddingモデル名、documentファイルの登録などについてのテストコードを書いています。
+- テスト用のファイルも同じディレクトリに配置し、正しいディレクトリにファイルが登録されるかをテストしています。
+- LLMのQ&Aがメインの機能ということもあり、これまでのプロジェクトと違ってあまり多くのパターンのテストはできていませんが、Q&Aを実行するまでのviewの各機能については一通りテストを行い、レスポンスに意図したテンプレートや文言が含まれているかを確認しています。
 
