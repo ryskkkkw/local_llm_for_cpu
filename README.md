@@ -18,7 +18,9 @@
 LLMのコンテキスト拡張ができるLlamaIndexを組み込んだのは、最初は2番目のポートフォリオである[e-lection](https://github.com/ryskkkkw/e-lection)に、投票機能だけでなくユーザーの政治に関する疑問などに答える機能を加えたいと考えたからです。LLMだけでは、持っているデータがそのモデルをトレーニングした時点のものに限られ、最新の情報を踏まえたQ&Aが実行できないことや、特定分野の詳細な情報を求められたときに対応が難しいため、LLMが推論を行う際にLlamaIndexで政治に関する資料データを与えることで、政治関係のドメインに特化した生成AIによるQ&A機能を実装することが目的でした。  
 
 しかし、[e-lection](https://github.com/ryskkkkw/e-lection)のREADME「1.プロジェクトについて」に書いたとおり、CPUで動かすLLMのQ&Aは実行に多くの時間を要するので、最終的にはe-lectionには組み込まずに別のプロジェクトとして、llama-cpp-pythonとLlamaIndexを組み合わせたローカルで動くLLMプログラム「「local_llm_for_cpu」」という形にしました。  
-結果的に別のプロジェクトとなりましたが、ローカル環境で動かすこと、任意のデータを与えて特定分野の質問にも答えられるようにすることという機能面での目的は一定程度達成できました。
+結果的に別のプロジェクトとなりましたが、ローカル環境で動かすこと、任意のデータを与えて特定分野の質問にも答えられるようにすることという機能面での目的は一定程度達成できました。  
+
+なお、これまでのプロジェクトと違い、このプロジェクトはLLMがメインのアプリケーションであり、CPUで実行するためパフォーマンスも十分ではないのでデプロイはしていませんが、Python,Djangoを学んだことのアウトプットというのがポートフォリオとしては本来の目的であるため、Djangoのフレームワークに組み込む形で実装しています。
 <br>
 
 # 2.ディレクトリ構成
@@ -64,3 +66,17 @@ LLMのコンテキスト拡張ができるLlamaIndexを組み込んだのは、�
         ├── llm_and_embed.html
         ├── llm_register.html
         └── response.html
+
+# 3.主なディレクトリの説明
+
+local_llmがこのプロジェクトで唯一のアプリケーションなので、その中で主なところを説明します。
+
+- モデルはLlmModel、EmbedModel、Documentの３つを実装しています。
+- LlmModelはアプリケーションで使用するLLM用のファイルフィールド持つモデルです。
+- EmbedModelはLLMが参照するデータを拡張するファイルやユーザーの質問を、ベクトル化する際に使うEmbeddingモデルを指定するための文字列フィールドを持つモデルです。
+- DocumentはLLMの参照データを拡張するファイル用のファイルフィールド、ファイル名の文字列フィールドを持ちます。また、DocumentはEmbedModelオブジェクトと多対一関係になっています。
+<br>
+
+- Q&Aを行う前に、使用するLLM、Embeddingモデル、documentファイルを登録する必要があります。
+- LLMはローカルにあるLLMファイルからアップロードする仕様になっています。アップロードしたLLMファイルは、local_llm_for_cpu/llm_resources/llm_modelsに登録されます。開発時は、[こちらのモデル](https://huggingface.co/mmnga/ELYZA-japanese-Llama-2-7b-fast-instruct-gguf/blob/main/ELYZA-japanese-Llama-2-7b-fast-instruct-q4_K_M.gguf)を使用しました。
+- Embeddingモデルは、使用するモデル名を文字列としてEmbedModelにあらかじめ登録しておき、Q&A実行時にそのモデル名によりHuggingFaceからEmbeddingモデルをダウンロードする仕様です。開発時は、[こちらのモデル](https://huggingface.co/oshizo/sbert-jsnli-luke-japanese-base-lite)を使用しました。
